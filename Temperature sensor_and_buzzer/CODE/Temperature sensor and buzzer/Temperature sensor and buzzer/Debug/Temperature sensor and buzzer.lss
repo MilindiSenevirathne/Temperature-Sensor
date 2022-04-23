@@ -1,0 +1,155 @@
+
+Temperature sensor and buzzer.elf:     file format elf32-avr
+
+Sections:
+Idx Name          Size      VMA       LMA       File off  Algn
+  0 .text         000000be  00000000  00000000  00000054  2**1
+                  CONTENTS, ALLOC, LOAD, READONLY, CODE
+  1 .data         00000000  00800060  00800060  00000112  2**0
+                  CONTENTS, ALLOC, LOAD, DATA
+  2 .comment      00000030  00000000  00000000  00000112  2**0
+                  CONTENTS, READONLY
+  3 .note.gnu.avr.deviceinfo 0000003c  00000000  00000000  00000144  2**2
+                  CONTENTS, READONLY
+  4 .debug_aranges 00000020  00000000  00000000  00000180  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  5 .debug_info   00000594  00000000  00000000  000001a0  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  6 .debug_abbrev 00000517  00000000  00000000  00000734  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  7 .debug_line   000001f5  00000000  00000000  00000c4b  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  8 .debug_frame  00000024  00000000  00000000  00000e40  2**2
+                  CONTENTS, READONLY, DEBUGGING
+  9 .debug_str    00000308  00000000  00000000  00000e64  2**0
+                  CONTENTS, READONLY, DEBUGGING
+ 10 .debug_loc    00000034  00000000  00000000  0000116c  2**0
+                  CONTENTS, READONLY, DEBUGGING
+ 11 .debug_ranges 00000010  00000000  00000000  000011a0  2**0
+                  CONTENTS, READONLY, DEBUGGING
+
+Disassembly of section .text:
+
+00000000 <__vectors>:
+   0:	0c 94 2a 00 	jmp	0x54	; 0x54 <__ctors_end>
+   4:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+   8:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+   c:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  10:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  14:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  18:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  1c:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  20:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  24:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  28:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  2c:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  30:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  34:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  38:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  3c:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  40:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  44:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  48:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  4c:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  50:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+
+00000054 <__ctors_end>:
+  54:	11 24       	eor	r1, r1
+  56:	1f be       	out	0x3f, r1	; 63
+  58:	cf e5       	ldi	r28, 0x5F	; 95
+  5a:	d8 e0       	ldi	r29, 0x08	; 8
+  5c:	de bf       	out	0x3e, r29	; 62
+  5e:	cd bf       	out	0x3d, r28	; 61
+  60:	0e 94 36 00 	call	0x6c	; 0x6c <main>
+  64:	0c 94 5d 00 	jmp	0xba	; 0xba <_exit>
+
+00000068 <__bad_interrupt>:
+  68:	0c 94 00 00 	jmp	0	; 0x0 <__vectors>
+
+0000006c <main>:
+{
+	int ADCOut=0;
+
+	char Temperature;
+
+	DDRD=0b0000100; // set pin 3 on port D as output to control the buzzer
+  6c:	84 e0       	ldi	r24, 0x04	; 4
+  6e:	81 bb       	out	0x11, r24	; 17
+
+	DDRA&=~(1<<7);
+  70:	8a b3       	in	r24, 0x1a	; 26
+  72:	8f 77       	andi	r24, 0x7F	; 127
+  74:	8a bb       	out	0x1a, r24	; 26
+
+	ADMUX=0b11000111;
+  76:	87 ec       	ldi	r24, 0xC7	; 199
+  78:	87 b9       	out	0x07, r24	; 7
+
+	ADCSRA=0b10000111;
+  7a:	87 e8       	ldi	r24, 0x87	; 135
+  7c:	86 b9       	out	0x06, r24	; 6
+
+	while(1)
+
+	{
+
+		ADCSRA|=(1<<6); //Set bit 6 n ADCSRA to start conversion
+  7e:	86 b1       	in	r24, 0x06	; 6
+  80:	80 64       	ori	r24, 0x40	; 64
+  82:	86 b9       	out	0x06, r24	; 6
+
+		while(get_bit(ADCSRA,6)==1) // poll bit 6 n ADCSRA till it is back to zero again
+  84:	36 99       	sbic	0x06, 6	; 6
+  86:	fe cf       	rjmp	.-4      	; 0x84 <main+0x18>
+		{
+
+		}
+
+
+		ADCOut=ADCL|(ADCH<<8); // Save the ADC reading into an integer variable ADCOut. The ADCL must be read first as written here.
+  88:	24 b1       	in	r18, 0x04	; 4
+  8a:	85 b1       	in	r24, 0x05	; 5
+  8c:	90 e0       	ldi	r25, 0x00	; 0
+  8e:	98 2f       	mov	r25, r24
+  90:	88 27       	eor	r24, r24
+  92:	82 2b       	or	r24, r18
+
+		Temperature=ADCOut/4; // Calculate Temperature
+  94:	9c 01       	movw	r18, r24
+  96:	33 23       	and	r19, r19
+  98:	14 f4       	brge	.+4      	; 0x9e <main+0x32>
+  9a:	2d 5f       	subi	r18, 0xFD	; 253
+  9c:	3f 4f       	sbci	r19, 0xFF	; 255
+  9e:	35 95       	asr	r19
+  a0:	27 95       	ror	r18
+  a2:	35 95       	asr	r19
+  a4:	27 95       	ror	r18
+
+
+		if (Temperature>45) // Check if temperature is above 45 Celsius degrees
+  a6:	2e 32       	cpi	r18, 0x2E	; 46
+  a8:	20 f0       	brcs	.+8      	; 0xb2 <main+0x46>
+
+		{
+
+			PORTD|=(1<<2); //turn on the buzzer
+  aa:	82 b3       	in	r24, 0x12	; 18
+  ac:	84 60       	ori	r24, 0x04	; 4
+  ae:	82 bb       	out	0x12, r24	; 18
+  b0:	e6 cf       	rjmp	.-52     	; 0x7e <main+0x12>
+
+		else
+
+		{
+
+			PORTD&=~(1<<2); //turn off the buzzer
+  b2:	82 b3       	in	r24, 0x12	; 18
+  b4:	8b 7f       	andi	r24, 0xFB	; 251
+  b6:	82 bb       	out	0x12, r24	; 18
+  b8:	e2 cf       	rjmp	.-60     	; 0x7e <main+0x12>
+
+000000ba <_exit>:
+  ba:	f8 94       	cli
+
+000000bc <__stop_program>:
+  bc:	ff cf       	rjmp	.-2      	; 0xbc <__stop_program>
